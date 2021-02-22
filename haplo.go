@@ -84,23 +84,19 @@ func main() {
 		dk0 = append(dk0, 0)
 	}
 
+	stopper := columns
 	pivot := 0
-	fmt.Println(ak0, dk0)
-
-	ak0, dk0 = computeNextArrays(ak0, dk0, pivot, lines)
-	pivot++
 
 	fmt.Println(ak0, dk0)
 
-	ak0, dk0 = computeNextArrays(ak0, dk0, pivot, lines)
-	pivot++
+	for i := 0; i < stopper; i++ {
+		ak0, dk0 = computeNextArrays(ak0, dk0, pivot, lines)
+		fmt.Println("Currently printing k = ", i)
+		fmt.Println("A_k:", ak0, "\tD_k:", dk0)
+		pivot++
+	}
 
-	fmt.Println(ak0, dk0)
-
-	ak0, dk0 = computeNextArrays(ak0, dk0, pivot, lines)
-	pivot++
-
-	fmt.Println(ak0, dk0)
+	return
 }
 
 func computeNextArrays(ak, dk []int, k int, matrix []string) ([]int, []int) {
@@ -134,18 +130,19 @@ func computeNextArrays(ak, dk []int, k int, matrix []string) ([]int, []int) {
 				p[l] = dk[i]
 			}
 		}
-		if allele == -6 {
+
+		if allele == 0 || allele == 1 {
+			a[allele] = append(a[allele], ak[i])
+			d[allele] = append(d[allele], p[allele])
+			p[allele] = 0
+			u[allele] = u[allele] + 1
+		} else {
 			for m := 0; m < alphabet; m++ {
 				a[m] = append(a[m], ak[i])
 				d[m] = append(d[m], p[m])
 				p[m] = 0
 				u[m] = u[m] + 1
 			}
-		} else {
-			a[allele] = append(a[allele], ak[i])
-			d[allele] = append(d[allele], p[allele])
-			p[allele] = 0
-			u[allele] = u[allele] + 1
 		}
 
 	}
