@@ -93,6 +93,11 @@ func main() {
 		ak0, dk0 = computeNextArrays(ak0, dk0, pivot, lines)
 		fmt.Println("Currently printing k = ", i)
 		fmt.Println("A_k:", ak0, "\tD_k:", dk0)
+		fmt.Println("Collapsing ...")
+		ak0, dk0 = collapse(ak0, dk0)
+		fmt.Println("A_k:", ak0, "\tD_k:", dk0)
+		fmt.Println("----####----")
+
 		pivot++
 	}
 
@@ -163,5 +168,33 @@ func computeNextArrays(ak, dk []int, k int, matrix []string) ([]int, []int) {
 		}
 	}
 	return akk, dkk
+
+}
+
+func collapse(a, d []int) ([]int, []int) {
+	ac := make([]int, 0, len(a))
+	dc := make([]int, 0, len(d))
+
+	j := 0
+	for j < len(a)-1 {
+		if a[j] == a[j+1] {
+			j++
+		} else {
+			ac = append(ac, a[j])
+			dc = append(dc, d[j])
+			j++
+		}
+
+	}
+	ac = append(ac, a[j])
+	dc = append(dc, d[j])
+	return ac, dc
+}
+
+func printMatrixForAk(matrix []string, ak []int) {
+
+}
+
+func printMatrixAtK(matrix []string, k int) {
 
 }
