@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 )
 
 func fileImport() {
@@ -15,9 +16,9 @@ const alphabet = 2
 
 func main() {
 
-	// inputFilePref := "hap_gen_10000_20220.txt"
+	inputFilePref := "bigFile.txt"
 	// inputFilePref := "test2.txt"
-	inputFilePref := "test.txt"
+	// inputFilePref := "test.txt"
 
 	var inFile = flag.String("in", inputFilePref, "input file relative path as a string")
 	flag.Parse()
@@ -30,6 +31,18 @@ func main() {
 	}
 
 	scanner := bufio.NewScanner(file)
+	buf := make([]byte, 0, 64*5000)
+	scanner.Buffer(buf, 1024*1024)
+
+	// reader := bufio.NewReader(file)
+
+	// scanner := bufio.NewScanner(file)
+	// buf := make([]byte, 0, 64*1024)
+	// scanner.Buffer(buf, 1024*1024) //1024*1024 => 1mb max (you can change value here to read larger files
+	// for scanner.Scan() {
+	// 	// do your stuff
+	// }
+
 	scanner.Split(bufio.ScanLines)
 	var lines []string
 	rows := 0
@@ -39,12 +52,11 @@ func main() {
 	}
 
 	file.Close()
-
 	columns := len(lines[0])
 
 	fmt.Println("First Column ") // remembver to -48
 	for i := 0; i < len(lines); i++ {
-		fmt.Print(lines[i][4] - 48)
+		fmt.Print(lines[i][0] - 48)
 	}
 
 	// // read file in a byte array, ram==file maybe needed, to check during tests.
@@ -87,19 +99,27 @@ func main() {
 	stopper := columns
 	pivot := 0
 
-	fmt.Println(ak0, dk0)
+	// fmt.Println(ak0, dk0)
+	var since time.Duration
+	var start time.Time
+	start = time.Now()
 
 	for i := 0; i < stopper; i++ {
+
 		ak0, dk0 = computeNextArrays(ak0, dk0, pivot, lines)
-		fmt.Println("Currently printing k = ", i)
-		fmt.Println("A_k:", ak0, "\tD_k:", dk0)
+		fmt.Println("Currently printing k = ", i+1)
+		fmt.Println("A_k[0]:", ak0[0], "\tD_k[0]:", dk0[0])
 		fmt.Println("Collapsing ...")
 		ak0, dk0 = collapse(ak0, dk0)
-		fmt.Println("A_k:", ak0, "\tD_k:", dk0)
+		fmt.Println("A_k[0]:", ak0[0], "\tnD_k[0]:", dk0[0])
 		fmt.Println("----####----")
 
 		pivot++
 	}
+	fmt.Println("Last size arrays: ak= ", len(ak0), " and dk= ", len(dk0))
+	since = time.Since(start)
+
+	fmt.Println("Started at : ", start, "\nRAN in ss: ", since)
 
 	return
 }
@@ -176,18 +196,22 @@ func collapse(a, d []int) ([]int, []int) {
 	dc := make([]int, 0, len(d))
 
 	j := 0
+	pivot := 0
 	for j < len(a)-1 {
 		if a[j] == a[j+1] {
 			j++
 		} else {
-			ac = append(ac, a[j])
-			dc = append(dc, d[j])
+			ac = append(ac, a[pivot])
+			dc = append(dc, d[pivot])
 			j++
+			pivot = j
 		}
 
 	}
-	ac = append(ac, a[j])
-	dc = append(dc, d[j])
+
+	ac = append(ac, a[pivot])
+	dc = append(dc, d[pivot])
+
 	return ac, dc
 }
 
